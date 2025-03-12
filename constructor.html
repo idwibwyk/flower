@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLOOM BOOM</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="text-center">
+        <a href="index.html">
+            <h1>BLOOM BOOM</h1>
+            <h2 style="letter-spacing: 3px; color: #FFFFFF;">flower designer</h2>
+            <img src="logo.svg" alt="Логотип" class="img-fluid"> 
+        </a>
+    </header>
+
+    <nav class="navbar navbar-expand navbar-light">
+        <ul class="navbar-nav mx-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="index.html">Главная <span class="sr-only">(текущая)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="constructor.html">Конструктор букета</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="flower.html">Информация о цветах</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="about.html">О нас</a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="container text-center mt-4">
+        <h2 style="font-family: 'Inter', sans-serif; font-weight: 700; color: #023721;">Создайте свой идеальный букет!</h2>
+        <p>Перетаскивайте цветы в вазу, чтобы создать уникальный букет.</p>
+    
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="vase-container">
+                    <img src="images/ваза.png" alt="Ваза" style="width: 60%; height: auto; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); z-index: 1;"> <!-- Уменьшен размер вазы -->
+                    <div id="flower-container" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 2;"></div>
+                </div>
+            </div>
+        </div>
+    
+        <h3 style="font-weight: 700; font-family: 'Inter', sans-serif;">Выберите цветы:</h3>
+        <div class="row justify-content-center" style="margin-top: 40px !important;">
+            <div class="col-md-2 flower" draggable="true" ondragstart="drag(event)" data-flower-type="rose">
+                <p>Роза</p>
+                <img src="images/роза.png" alt="Роза" style="width: 100%; height: auto;">
+            </div>
+            <div class="col-md-2 flower" draggable="true" ondragstart="drag(event)" data-flower-type="chrysanthemum">
+                <p>Хризантема</p>
+                <img src="images/хризантема.png" alt="Хризантема" style="width: 100%; height: auto;">
+            </div>
+            <div class="col-md-2 flower" draggable="true" ondragstart="drag(event)" data-flower-type="tulip">
+                <p>Тюльпан</p>
+                <img src="images/тюльпан.png" alt="Тюльпан" style="width: 100%; height: auto;">
+            </div>
+            <div class="col-md-2 flower" draggable="true" ondragstart="drag(event)" data-flower-type="peony">
+                <p>Пион</p>
+                <img src="images/пион.png" alt="Пион" style="width: 100%; height: auto;">
+            </div>
+            <div class="col-md-2 flower" draggable="true" ondragstart="drag(event)" data-flower-type="lily">
+                <p>Лилия</p>
+                <img src="images/лилия.png" alt="Лилия" style="width: 100%; height: auto;">
+            </div>
+        </div>
+        
+        <button class="btn btn-success btn-create" data-toggle="modal" data-target="#bouquetModal" style="margin-bottom: 20px !important;">Создать свой букет</button>
+        <button class="btn btn-danger btn-remove" style="margin-left: 10px;">Удалить последний цветок</button>
+        <button class="btn btn-primary btn-save" style="margin-left: 10px; font-weight: bold;">Получить файл с данными о букете</button> <!-- Кнопка для сохранения -->
+
+        <!-- Модальное окно -->
+        <div class="modal fade" id="bouquetModal" tabindex="-1" role="dialog" aria-labelledby="bouquetModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="bouquetModalLabel">Ваш букет</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="flower-counts">
+                        <!-- Здесь будет отображаться поздравительный текст и количество каждого цветка -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        const flowerCounts = {
+            rose: 0,
+            chrysanthemum: 0,
+            tulip: 0,
+            peony: 0,
+            lily: 0
+        };
+    
+        const flowerContainer = document.getElementById('flower-container');
+        const addedFlowers = []; // Массив для хранения добавленных цветков
+    
+        function drag(event) {
+            const flowerType = event.target.parentElement.getAttribute("data-flower-type");
+            event.dataTransfer.setData("text/plain", event.target.src);
+            event.dataTransfer.setData("flowerType", flowerType);
+        }
+        
+        flowerContainer.addEventListener('dragover', function(event) {
+            event.preventDefault(); // Позволяет сбрасывать элемент
+        });
+        
+        flowerContainer.addEventListener('drop', function(event) {
+            event.preventDefault();
+            const flowerSrc = event.dataTransfer.getData("text/plain");
+            const flowerType = event.dataTransfer.getData("flowerType");
+    
+            // Получаем координаты для размещения цветка
+            const dropX = event.offsetX;
+            const dropY = event.offsetY;
+    
+            const flowerImg = document.createElement("img");
+            flowerImg.src = flowerSrc;
+            flowerImg.style.position = "absolute";
+            flowerImg.style.width = "80px"; // Установите нужный размер
+            flowerImg.style.height = "auto"; // Автоматическая высота для сохранения пропорций
+    
+            // Проверяем, находится ли цветок в пределах допустимых координат
+            if (dropX >= 150 && dropX <= 313 && dropY >= 0 && dropY <= 150) {
+                flowerImg.style.left = dropX + "px"; // Позиция по X
+                flowerImg.style.top = dropY + "px"; // Позиция по Y
+            } else {
+                // Генерируем случайные координаты в разрешенной области
+                let randomX, randomY;
+                do {
+                    randomX = Math.floor(Math.random() * (313 - 150)) + 150;
+                    randomY = Math.floor(Math.random() * (150 - 0)) + 0;
+                    flowerImg.style.left = randomX + "px"; // Позиция по X
+                    flowerImg.style.top = randomY + "px"; // Позиция по Y
+                } while (isOverlapping(flowerImg, this.getElementsByTagName("img")));
+            }
+    
+            // Добавляем цветок в вазу
+            this.appendChild(flowerImg);
+            flowerCounts[flowerType]++;
+            addedFlowers.push({ img: flowerImg, type: flowerType }); // Сохраняем добавленный цветок с типом
+        });
+    
+        function isOverlapping(newFlower, existingFlowers) {
+            const newRect = newFlower.getBoundingClientRect();
+    
+            for (let flower of existingFlowers) {
+                const existingRect = flower.getBoundingClientRect();
+                if (
+                    newRect.x < existingRect.x + existingRect.width &&
+                    newRect.x + newRect.width > existingRect.x &&
+                    newRect.y < existingRect.y + existingRect.height &&
+                    newRect.y + newRect.height > existingRect.y
+                ) {
+                    return true; // Пересечение найдено
+                }
+            }
+            return false; // Пересечения нет
+        }
+    
+        // Обработчик события для кнопки "Создать букет"
+        document.querySelector('.btn-create').addEventListener('click', function() {
+            console.log("Кнопка 'Создать букет' нажата"); // Отладочный вывод
+            console.log("Длина addedFlowers:", addedFlowers.length); // Проверка длины массива
+
+            // Проверяем, есть ли добавленные цветы
+            if (addedFlowers.length === 0) {
+                // Если цветы не добавлены, открываем модальное окно с уведомлением
+                const flowerCountDiv = document.getElementById('flower-counts');
+                flowerCountDiv.innerHTML = ''; // Очищаем предыдущее содержимое
+
+                // Добавляем сообщение о том, что цветы не добавлены
+                const noFlowersMessage = document.createElement('p');
+                noFlowersMessage.textContent = "Нет добавленных цветов!";
+                noFlowersMessage.style.fontWeight = "bold"; // Жирный текст
+                noFlowersMessage.style.color = "red"; // Красный цвет для выделения
+                flowerCountDiv.appendChild(noFlowersMessage);
+
+                // Добавляем инструкции по добавлению цветов
+                const instructionsMessage = document.createElement('p');
+                instructionsMessage.textContent = "Пожалуйста, перетащите цветы в вазу, чтобы создать букет.";
+                flowerCountDiv.appendChild(instructionsMessage);
+
+                // Открываем модальное окно
+                $('#bouquetModal').modal('show');
+                return; // Прекращаем выполнение функции
+            }
+
+            // Если цветы добавлены, открываем модальное окно
+            const flowerCountDiv = document.getElementById('flower-counts');
+            flowerCountDiv.innerHTML = ''; // Очищаем предыдущее содержимое
+
+            // Добавляем поздравительный текст
+            const congratulatoryMessage = document.createElement('p');
+            congratulatoryMessage.textContent = "Поздравляем, Вы создали свой собственный индивидуальный букет!";
+            congratulatoryMessage.style.fontWeight = "bold"; // Жирный текст
+            congratulatoryMessage.style.fontSize = "1.2em"; // Увеличенный размер шрифта
+            flowerCountDiv.appendChild(congratulatoryMessage);
+
+            // Добавляем текст о содержимом букета
+            const bouquetMessage = document.createElement('p');
+            bouquetMessage.textContent = "Ваш букет состоит из:";
+            bouquetMessage.style.fontWeight = "bold"; // Жирный текст
+            flowerCountDiv.appendChild(bouquetMessage);
+
+            // Генерируем список цветов и их количества
+            for (const [flowerType, count] of Object.entries(flowerCounts)) {
+                if (count > 0) {
+                    const flowerItem = document.createElement('p');
+                    const flowerName = getFlowerNameInRussian(flowerType); // Получаем название цветка на русском
+                    flowerItem.textContent = `${flowerName}: ${count}`;
+                    flowerCountDiv.appendChild(flowerItem);
+                }
+            }
+
+            // Открываем модальное окно
+            $('#bouquetModal').modal('show');
+        });
+
+        // Функция для получения названия цветка на русском языке
+        function getFlowerNameInRussian(flowerType) {
+            const flowerNames = {
+                rose: "Роза",
+                chrysanthemum: "Хризантема",
+                tulip: "Тюльпан",
+                peony: "Пион",
+                lily: "Лилия"
+            };
+            return flowerNames[flowerType] || flowerType; // Возвращаем название или сам тип, если не найдено
+        }
+
+        // Обработчик события для кнопки "Удалить последний цветок"
+        document.querySelector('.btn-remove').addEventListener('click', function() {
+            if (addedFlowers.length > 0) {
+                const lastFlower = addedFlowers.pop(); // Удаляем последний цветок из массива
+                flowerContainer.removeChild(lastFlower.img); // Удаляем его из контейнера
+    
+                // Уменьшаем счетчик для соответствующего цветка
+                flowerCounts[lastFlower.type] = Math.max(0, flowerCounts[lastFlower.type] - 1); // Уменьшаем счетчик
+    
+                // Обновляем модальное окно
+                updateModal();
+            } else {
+                alert("Нет добавленных цветков для удаления!"); // Предупреждение, если нет цветков
+            }
+        });
+
+        // Функция для обновления модального окна
+        function updateModal() {
+            const flowerCountDiv = document.getElementById('flower-counts');
+            flowerCountDiv.innerHTML = ''; // Очищаем предыдущее содержимое
+    
+            // Добавляем поздравительный текст
+            const congratulatoryMessage = document.createElement('p');
+            congratulatoryMessage.textContent = "Поздравляем, Вы создали свой собственный индивидуальный букет!";
+            congratulatoryMessage.style.fontWeight = "bold"; // Жирный текст
+            congratulatoryMessage.style.fontSize = "1.2em"; // Увеличенный размер шрифта
+            flowerCountDiv.appendChild(congratulatoryMessage);
+    
+            // Добавляем текст о содержимом букета
+            const bouquetMessage = document.createElement('p');
+            bouquetMessage.textContent = "Ваш букет состоит из:";
+            bouquetMessage.style.fontWeight = "bold"; // Жирный текст
+            flowerCountDiv.appendChild(bouquetMessage);
+    
+            // Генерируем список цветов и их количества
+            for (const [flowerType, count] of Object.entries(flowerCounts)) {
+                if (count > 0) {
+                    const flowerItem = document.createElement('p');
+                    const flowerName = getFlowerNameInRussian(flowerType); // Получаем название цветка на русском
+                    flowerItem.textContent = `${flowerName}: ${count}`;
+                    flowerCountDiv.appendChild(flowerItem);
+                }
+            }
+        }
+
+        // Обработчик события для кнопки "Сохранить букет в JSON"
+        document.querySelector('.btn-save').addEventListener('click', function() {
+            const jsonData = JSON.stringify(flowerCounts, null, 2); // Преобразуем данные в JSON
+            const blob = new Blob([jsonData], { type: 'application/json' }); // Создаем Blob
+            const url = URL.createObjectURL(blob); // Создаем ссылку для скачивания
+
+            // Создаем временную ссылку для скачивания
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'bouquet.json'; // Имя файла
+            document.body.appendChild(a);
+            a.click(); // Имитируем клик для скачивания
+            document.body.removeChild(a); // Удаляем временную ссылку
+            URL.revokeObjectURL(url); // Освобождаем память
+        });
+    </script>
+    
+
+    <footer class="text-center py-3" style="background-color: #023721; color: #FFFFFF;">
+        <div class="footer-content">
+            <h5>Связаться с нами:</h5>
+            <div class="contact-info">
+                <i class="fas fa-envelope"></i> Email: bloomboom@mail.ru
+            </div>
+            <div class="contact-info">
+                <i class="fas fa-phone-alt"></i> Телефон: +7 (123) 456-78-90
+            </div>
+            <div class="contact-info">
+                <i class="fas fa-map-marker-alt"></i> Адрес: ул. Цветочная, 1, г. Владимир
+            </div>
+        </div>
+        <p>&copy; 2024 BLOOM BOOM. Все права защищены.</p>
+        <a href="index.html">
+            <img src="logo.svg" alt="Маленький логотип" class="footer-logo">
+        </a>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
